@@ -79,3 +79,25 @@ export const login = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+export const getUserInfo = async (req, res) => {
+  try {
+    const userData = await User.findById(req.userId);
+    if (!userData) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    return res.status(200).json({
+      id: userData.id,
+      email: userData.email,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      image: userData.image,
+      color: userData.color,
+      profileSetup: userData.profileSetup,
+    });
+    console.log("userId: ", req.userId);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};

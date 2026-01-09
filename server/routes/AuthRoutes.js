@@ -1,5 +1,10 @@
 import { Router } from "express";
-import { signup, login, getUserInfo } from "../controllers/authCtrl.js";
+import {
+  signup,
+  login,
+  getUserInfo,
+  updateProfile,
+} from "../controllers/authCtrl.js";
 import { verifyToken } from "../middlewares/authMiddleware.js";
 
 const authRoutes = Router();
@@ -7,5 +12,6 @@ const authRoutes = Router();
 authRoutes.post("/signup", signup);
 authRoutes.post("/login", login);
 authRoutes.get("/user-info", verifyToken, getUserInfo);
+authRoutes.post("/update-profile", verifyToken, updateProfile);
 
 export default authRoutes;

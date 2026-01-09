@@ -95,7 +95,42 @@ export const getUserInfo = async (req, res) => {
       color: userData.color,
       profileSetup: userData.profileSetup,
     });
-    console.log("userId: ", req.userId);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const updateProfile = async (req, res) => {
+  try {
+    const { userId } = req;
+    const { firstName, lastName, color } = req.body;
+    if (!firstName || !lastName) {
+      return res
+        .status(404)
+        .json({ message: "First name, last name, and color are required." });
+    }
+
+    const userData = await User.findByIdAndUpdate(
+      userId,
+      {
+        firstName,
+        lastName,
+        color,
+        profileSetup: true,
+      },
+      { new: true, runValidators: true }
+    );
+
+    return res.status(200).json({
+      id: userData.id,
+      email: userData.email,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      image: userData.image,
+      color: userData.color,
+      profileSetup: userData.profileSetup,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });

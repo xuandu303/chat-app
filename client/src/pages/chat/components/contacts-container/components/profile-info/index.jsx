@@ -1,7 +1,7 @@
 import { useAppStore } from "@/store";
 import { getColor } from "@/lib/utils";
 import React from "react";
-import { HOST } from "@/utils/constants";
+import { HOST, LOGOUT_ROUTE } from "@/utils/constants";
 import {
   Tooltip,
   TooltipContent,
@@ -12,11 +12,26 @@ import { FiEdit2 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { TbLogout } from "react-icons/tb";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import apiClient from "@/lib/api-client";
 
 const ProfileInfo = () => {
-  const { userInfo } = useAppStore();
+  const { userInfo, setUserInfo } = useAppStore();
   const navigate = useNavigate();
-  const logOut = async () => {};
+  const logOut = async () => {
+    try {
+      const response = await apiClient.post(
+        LOGOUT_ROUTE,
+        {},
+        { withCredentials: true }
+      );
+      if (response.status === 200) {
+        navigate("auth");
+        setUserInfo(null);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <div className="absolute bottom-0 h-16 flex items-center justify-between px-10 w-full bg-[#2a2b33]">
       <div className="flex gap-3 items-center justify-center">

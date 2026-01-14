@@ -189,3 +189,13 @@ export const removeProfileImage = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+export const logout = async (req, res) => {
+  try {
+    res.cookie("jwt", "", { maxAge: 1, secure: true, sameSite: "None" });
+    return res.status(200).json({ message: "Logout successFull" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};

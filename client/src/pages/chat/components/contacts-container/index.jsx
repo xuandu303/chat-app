@@ -4,18 +4,16 @@ import NewDM from "./new-dm";
 
 const ContactsContainer = () => {
   return (
-    <div className="relative md:w-[35vw] lg:w-[20vw] xl:w-[20vw] bg-[#1b1c24] border-r-2 border-[#2f303b] w-full">
-      <div className="pt-3">
+    <div className="relative sm:w-[35vw] lg:w-[26vw] xl:w-[22vw] bg-[#1b1c24] border-r-2 border-[#2f303b] w-full">
+      <div className="pt-5 pb-8 flex justify-center">
         <Logo />
       </div>
-      <div className="my-5">
-        <div className="flex items-center justify-between pr-10">
+      <div className="flex flex-col gap-y-5 px-5">
+        <div className="flex items-center justify-between">
           <Title text="Direct Messages" />
           <NewDM />
         </div>
-      </div>
-      <div className="my-5">
-        <div className="flex items-center justify-between pr-10">
+        <div className="flex items-center justify-betweens">
           <Title text="Channels" />
         </div>
       </div>
@@ -28,11 +26,11 @@ export default ContactsContainer;
 
 const Logo = () => {
   return (
-    <div className="flex p-5  justify-start items-center gap-2">
+    <div className="flex justify-start items-center">
       <svg
         id="logo-38"
-        width="78"
-        height="32"
+        width="70"
+        height="24"
         viewBox="0 0 78 32"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -54,14 +52,14 @@ const Logo = () => {
           fill="#a16ee8"
         ></path>{" "}
       </svg>
-      <span className="text-3xl font-semibold ">ChatApp</span>
+      <span className="text-2xl font-bold ">ChatApp</span>
     </div>
   );
 };
 
 const Title = ({ text }) => {
   return (
-    <h2 className="uppercase tracking-widest text-neutral-400 pl-10 font-light text-opacity-90 text-sm">
+    <h2 className="uppercase tracking-widest text-neutral-400 font-light text-opacity-90 text-sm">
       {text}
     </h2>
   );

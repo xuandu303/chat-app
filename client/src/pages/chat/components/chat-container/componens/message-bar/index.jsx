@@ -1,3 +1,5 @@
+import { useSocket } from "@/context/SocketContext";
+import { useAppStore } from "@/store";
 import EmojiPicker from "emoji-picker-react";
 import { useEffect, useRef, useState } from "react";
 import { GrAttachment } from "react-icons/gr";
@@ -6,6 +8,8 @@ import { RiEmojiStickerLine } from "react-icons/ri";
 
 const MessageBar = () => {
   const emojiRef = useRef(null);
+  const socket = useSocket();
+  const { selectedChatType, selectedChatData, userInfo } = useAppStore();
   const [message, setMessage] = useState("");
   const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
 
@@ -25,8 +29,22 @@ const MessageBar = () => {
     setMessage((msg) => msg + emoji.emoji);
   };
 
-  const handleSendMessage = () => {
-    // Logic to send the message
+  const handleSendMessage = async () => {
+    if (!socket || !message.trim()) return;
+    if (selectedChatType !== "contact") return;
+    if (!selectedChatData?._id) return;
+
+    if (selectedChatType === "contact") {
+      socket.emit("sendMessage", {
+        sender: userInfo.id,
+        content: message,
+        recipient: selectedChatData._id,
+        messageType: "text",
+        fileUrl: undefined,
+      });
+    }
+    setMessage("");
+    setEmojiPickerOpen(false);
   };
 
   return (
@@ -38,6 +56,11 @@ const MessageBar = () => {
           placeholder="Enter Message"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSendMessage();
+            }
+          }}
         />
         <button className="text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all">
           <GrAttachment className="text-xl hover:text-white" />
@@ -45,7 +68,7 @@ const MessageBar = () => {
         <div className="relative">
           <button
             className="text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all flex items-center"
-            onClick={() => setEmojiPickerOpen(true)}
+            onClick={() => setEmojiPickerOpen((prev) => !prev)}
           >
             <RiEmojiStickerLine className="text-2xl hover:text-white" />
           </button>
@@ -63,6 +86,7 @@ const MessageBar = () => {
       <button
         className="bg-[#8417ff] focus:border-none flex items-center justify-center p-3.5 hover:bg-[#741bda] focus:bg-[#741bda] focus:outline-none focus:text-white duration-300 transition-all rounded-full cursor-pointer"
         onClick={handleSendMessage}
+        disabled={!message.trim()}
       >
         <IoSend className="text-xl" />
       </button>

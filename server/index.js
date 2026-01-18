@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
 import authRoutes from "./routes/authRoutes.js";
 import contactsRoutes from "./routes/contactsRoutes.js";
+import messagesRoutes from "./routes/messagesRoutes.js";
 import setupSocket from "./socket.js";
 
 dotenv.config();
@@ -20,7 +21,7 @@ app.use(
     origin: [process.env.ORIGIN],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
-  })
+  }),
 );
 
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
@@ -30,6 +31,7 @@ app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/contacts", contactsRoutes);
+app.use("/api/messages", messagesRoutes);
 
 const server = app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

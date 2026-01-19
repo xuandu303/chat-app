@@ -1,6 +1,7 @@
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import animationData from "@/assets/lottie-json";
+import moment from "moment";
 
 export function cn(...inputs) {
   return twMerge(clsx(inputs));
@@ -24,4 +25,36 @@ export const animationDefaultOptions = {
   loop: true,
   autoplay: true,
   animationData,
+};
+
+/**
+ * @param {string | Date} time
+ * @returns {string}
+ */
+
+export const formatLastMessageTime = (time) => {
+  if (!time) return "";
+
+  const now = moment();
+  const messageTime = moment(time);
+
+  if (messageTime.isSame(now, "day")) {
+    const diffMinutes = now.diff(messageTime, "minutes");
+
+    if (diffMinutes < 60) {
+      return `${diffMinutes}m`;
+    }
+
+    const diffHours = now.diff(messageTime, "hours");
+    return `${diffHours}h`;
+  }
+
+  const diffDays = now.diff(messageTime, "days");
+
+  if (diffDays <= 7) {
+    return `${diffDays}d`;
+  }
+
+  const diffWeeks = now.diff(messageTime, "weeks");
+  return `${diffWeeks}w`;
 };

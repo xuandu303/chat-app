@@ -15,9 +15,9 @@ export const getMessages = async (req, res) => {
         { sender: user2, recipient: user1 },
       ],
     })
-      .sort({ timestamp: 1 })
+      .sort({ timestamp: -1 })
       .limit(20);
-
+    messages.reverse();
     return res.status(200).json({ messages });
   } catch (error) {
     console.error({ error });

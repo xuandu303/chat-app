@@ -1,19 +1,44 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ProfileInfo from "./components/profile-info";
 import NewDM from "./new-dm";
+import { GET_DM_CONTACTS_ROUTES } from "@/utils/constants";
+import apiClient from "@/lib/api-client";
+import { useAppStore } from "@/store";
+import ContactList from "@/components/contact-list";
 
 const ContactsContainer = () => {
+  const { setDirectMessagesContacts, directMessagesContacts } = useAppStore();
+
+  useEffect(() => {
+    const getContacts = async () => {
+      const response = await apiClient.get(GET_DM_CONTACTS_ROUTES, {
+        withCredentials: true,
+      });
+
+      if (response.data.contacts) {
+        setDirectMessagesContacts(response.data.contacts);
+      }
+    };
+    getContacts();
+  }, []);
+
   return (
     <div className="relative sm:w-[35vw] lg:w-[26vw] xl:w-[22vw] bg-[#1b1c24] border-r-2 border-[#2f303b] w-full">
       <div className="pt-5 pb-8 flex justify-center">
         <Logo />
       </div>
-      <div className="flex flex-col gap-y-5 px-5">
-        <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-y-5 px-2">
+        <div className="flex py-2 items-center px-3 justify-between">
           <Title text="Direct Messages" />
           <NewDM />
         </div>
-        <div className="flex items-center justify-betweens">
+        {directMessagesContacts && directMessagesContacts.length > 0 && (
+          <div className="max-h-[38vh] overflow-y-auto scrollbar-hidden">
+            <ContactList contacts={directMessagesContacts} />
+          </div>
+        )}
+
+        <div className="flex py-2 items-center px-3 justify-betweens">
           <Title text="Channels" />
         </div>
       </div>

@@ -53,6 +53,8 @@ export const getContactsForDMList = async (req, res) => {
               else: "$sender",
             },
           },
+          lastMessageSenderId: { $first: "$sender" },
+          lastMessageType: { $first: "$messageType" },
           lastMessageTime: { $first: "$timestamp" },
           lastMessage: { $first: "$content" },
         },
@@ -71,6 +73,8 @@ export const getContactsForDMList = async (req, res) => {
       {
         $project: {
           _id: 1,
+          lastMessageSenderId: 1,
+          lastMessageType: 1,
           lastMessageTime: 1,
           lastMessage: 1,
           email: "$contactInfo.email",

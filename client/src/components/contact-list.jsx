@@ -1,5 +1,5 @@
 import { useAppStore } from "@/store";
-import React from "react";
+import React, { useEffect } from "react";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { HOST } from "@/utils/constants";
 import { getColor, formatLastMessageTime } from "@/lib/utils";
@@ -21,6 +21,10 @@ const ContactList = ({ contacts, isChannel = false }) => {
       setSelectedChatMessages([]);
     }
   };
+
+  useEffect(() => {
+    console.log("DM Contacts", contacts);
+  }, []);
 
   return (
     <div>

@@ -35,7 +35,7 @@ const NewDM = () => {
         const response = await apiClient.post(
           SEARCH_CONTACTS_ROUTES,
           { searchTerm },
-          { withCredentials: true }
+          { withCredentials: true },
         );
         if (response.status === 200 && response.data.contacts) {
           setSearchedContacts(response.data.contacts);
@@ -102,7 +102,7 @@ const NewDM = () => {
                         ) : (
                           <div
                             className={`uppercase h-12 w-12 text-lg border-1px flex items-center justify-center rounded-full ${getColor(
-                              contact.color
+                              contact.color,
                             )}`}
                           >
                             {contact.firstName

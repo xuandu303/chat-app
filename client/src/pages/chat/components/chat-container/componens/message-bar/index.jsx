@@ -91,12 +91,12 @@ const MessageBar = () => {
   };
 
   return (
-    <div className="h-[10vh] bg-[#1c1d25] flex justify-center items-center px-8 mb-6 gap-4">
+    <div className="h-[10vh] bg-[#1c1d25] flex justify-center items-center px-8 mb-6 gap-3">
       <div className="flex-1 flex bg-[#2a2b33] rounded-full items-center gap-4 pr-6">
         <input
           type="text"
-          className="flex-1 p-3 px-5 bg-transparent rounded-full focus:border-none focus:outline-none"
-          placeholder="Enter Message"
+          className="flex-1 p-2 px-4 bg-transparent rounded-full focus:border-none focus:outline-none"
+          placeholder="Aa"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={(e) => {
@@ -136,7 +136,7 @@ const MessageBar = () => {
         </div>
       </div>
       <button
-        className="bg-[#8417ff] focus:border-none flex items-center justify-center p-3.5 hover:bg-[#741bda] focus:bg-[#741bda] focus:outline-none focus:text-white duration-300 transition-all rounded-full cursor-pointer"
+        className="bg-[#8417ff] focus:border-none flex items-center justify-center p-2.75 hover:bg-[#741bda] focus:bg-[#741bda] focus:outline-none focus:text-white duration-300 transition-all rounded-full cursor-pointer"
         onClick={handleSendMessage}
         disabled={!message.trim()}
       >

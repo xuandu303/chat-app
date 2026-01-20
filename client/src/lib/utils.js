@@ -42,7 +42,7 @@ export const formatLastMessageTime = (time) => {
   const diffHours = now.diff(messageTime, "hours");
   const diffDays = now.diff(messageTime, "days");
 
-  if (diffMinutes < 1) return "now";
+  if (diffMinutes < 1) return "1m";
   if (diffMinutes < 60) return `${diffMinutes}m`;
   if (diffHours < 24) return `${diffHours}h`;
   if (diffDays <= 7) return `${diffDays}d`;

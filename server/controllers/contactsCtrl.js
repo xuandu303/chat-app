@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import User from "../models/userModel.js";
 import Message from "../models/messagesModel.js";
+
 export const searchContacts = async (req, res) => {
   try {
     const { searchTerm } = req.body;
@@ -88,6 +89,25 @@ export const getContactsForDMList = async (req, res) => {
         $sort: { lastMessageTime: -1 },
       },
     ]);
+
+    return res.status(200).json({ contacts });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const getAllContacts = async (req, res) => {
+  try {
+    const users = await User.find(
+      { _id: { $ne: req.userId } },
+      "firstName lastName _id email",
+    );
+
+    const contacts = users.map((user) => ({
+      label: user.firstName ? `${user.firstName} ${user.lastName}` : user.email,
+      value: user._id,
+    }));
 
     return res.status(200).json({ contacts });
   } catch (error) {

@@ -1,10 +1,11 @@
 import React, { useEffect } from "react";
 import ProfileInfo from "./components/profile-info";
-import NewDM from "./new-dm";
+import NewDM from "./components/new-dm";
 import { GET_DM_CONTACTS_ROUTES } from "@/utils/constants";
 import apiClient from "@/lib/api-client";
 import { useAppStore } from "@/store";
 import ContactList from "@/components/contact-list";
+import CreateChannel from "./components/create-channel";
 
 const ContactsContainer = () => {
   const { setDirectMessagesContacts, directMessagesContacts } = useAppStore();
@@ -38,8 +39,9 @@ const ContactsContainer = () => {
           </div>
         )}
 
-        <div className="flex py-2 items-center px-3 justify-betweens">
+        <div className="flex py-2 items-center px-3 justify-between">
           <Title text="Channels" />
+          <CreateChannel />
         </div>
       </div>
       <ProfileInfo />

@@ -1,5 +1,7 @@
 import { useSocket } from "@/context/SocketContext";
+import apiClient from "@/lib/api-client";
 import { useAppStore } from "@/store";
+import { UPLOAD_FILE_ROUTE } from "@/utils/constants";
 import EmojiPicker from "emoji-picker-react";
 import { useEffect, useRef, useState } from "react";
 import { GrAttachment } from "react-icons/gr";
@@ -8,6 +10,7 @@ import { RiEmojiStickerLine } from "react-icons/ri";
 
 const MessageBar = () => {
   const emojiRef = useRef(null);
+  const fileInputRef = useRef(null);
   const socket = useSocket();
   const { selectedChatType, selectedChatData, userInfo } = useAppStore();
   const [message, setMessage] = useState("");
@@ -47,6 +50,42 @@ const MessageBar = () => {
     setEmojiPickerOpen(false);
   };
 
+  const handleAttachmentClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleAttachmentChange = async (event) => {
+    try {
+      const file = event.target.files?.[0];
+      if (file) {
+        const formData = new FormData();
+        formData.append("file", file);
+        const response = await apiClient.post(UPLOAD_FILE_ROUTE, formData, {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        if (response.status === 200 && response.data) {
+          if (selectedChatType === "contact" && socket?.connected) {
+            socket.emit("sendMessage", {
+              sender: userInfo.id,
+              content: null,
+              recipient: selectedChatData._id,
+              messageType: "file",
+              fileUrl: response.data.filePath,
+            });
+          }
+          event.target.value = null;
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div className="h-[10vh] bg-[#1c1d25] flex justify-center items-center px-8 mb-6 gap-4">
       <div className="flex-1 flex bg-[#2a2b33] rounded-full items-center gap-4 pr-6">
@@ -62,9 +101,18 @@ const MessageBar = () => {
             }
           }}
         />
-        <button className="text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all">
+        <button
+          className="text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all"
+          onClick={handleAttachmentClick}
+        >
           <GrAttachment className="text-xl hover:text-white" />
         </button>
+        <input
+          type="file"
+          ref={fileInputRef}
+          className="hidden"
+          onChange={handleAttachmentChange}
+        />
         <div className="relative">
           <button
             className="text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all flex items-center"

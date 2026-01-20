@@ -38,22 +38,14 @@ export const formatLastMessageTime = (time) => {
   const now = moment();
   const messageTime = moment(time);
 
-  if (messageTime.isSame(now, "day")) {
-    const diffMinutes = now.diff(messageTime, "minutes");
-
-    if (diffMinutes < 60) {
-      return `${diffMinutes}m`;
-    }
-
-    const diffHours = now.diff(messageTime, "hours");
-    return `${diffHours}h`;
-  }
-
+  const diffMinutes = now.diff(messageTime, "minutes");
+  const diffHours = now.diff(messageTime, "hours");
   const diffDays = now.diff(messageTime, "days");
 
-  if (diffDays <= 7) {
-    return `${diffDays}d`;
-  }
+  if (diffMinutes < 1) return "now";
+  if (diffMinutes < 60) return `${diffMinutes}m`;
+  if (diffHours < 24) return `${diffHours}h`;
+  if (diffDays <= 7) return `${diffDays}d`;
 
   const diffWeeks = now.diff(messageTime, "weeks");
   return `${diffWeeks}w`;

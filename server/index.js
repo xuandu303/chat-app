@@ -8,6 +8,7 @@ import authRoutes from "./routes/authRoutes.js";
 import contactsRoutes from "./routes/contactsRoutes.js";
 import messagesRoutes from "./routes/messagesRoutes.js";
 import setupSocket from "./socket.js";
+import fs from "fs";
 
 dotenv.config();
 
@@ -24,7 +25,13 @@ app.use(
   }),
 );
 
-app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+const uploadsDir = path.join(process.cwd(), "uploads");
+
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+app.use("/uploads", express.static(uploadsDir));
 
 app.use(express.json());
 app.use(cookieParser());

@@ -3,6 +3,7 @@ import { useAppStore } from "@/store";
 import { GET_ALL_MESSAGES_ROUTES } from "@/utils/constants";
 import moment from "moment";
 import React, { useEffect, useRef } from "react";
+import { HOST } from "@/utils/constants";
 
 const MessageContainer = () => {
   const scrollRef = useRef();
@@ -39,6 +40,12 @@ const MessageContainer = () => {
     }
   }, [selectedChatMessages.length]);
 
+  const checkIfImage = (filePath) => {
+    const imageRegex =
+      /\.(jpeg|jpg|gif|png|bmp|tiff|tif|svg|webp|ico|heic|heif)$/i;
+    return imageRegex.test(filePath);
+  };
+
   const renderMessages = () => {
     let lastDate = null;
     return selectedChatMessages.map((message) => {
@@ -74,6 +81,28 @@ const MessageContainer = () => {
           } inline-block py-1.5 px-2.5 rounded-full my-1 max-w-[50%] wrap-break-word`}
         >
           {message.content}
+        </div>
+      )}
+      {message.messageType === "file" && (
+        <div
+          className={`${
+            message.sender !== selectedChatData._id
+              ? "bg-[#8417ff] text-white"
+              : "bg-gray-500/50 text-white/80"
+          } inline-block my-1 rounded-[18px] max-w-[50%] wrap-break-word`}
+        >
+          {checkIfImage(message.fileUrl) ? (
+            <div className="cursor-pointer">
+              <img
+                className="object-cover rounded-[18px]"
+                src={`${HOST}/${message.fileUrl}`}
+                height={300}
+                width={300}
+              />
+            </div>
+          ) : (
+            <div></div>
+          )}
         </div>
       )}
       <div className="text-xs text-gray-600">

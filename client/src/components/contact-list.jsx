@@ -10,6 +10,7 @@ const ContactList = ({ contacts, isChannel = false }) => {
     setSelectedChatData,
     setSelectedChatType,
     setSelectedChatMessages,
+    userInfo,
   } = useAppStore();
 
   const handleClick = (contact) => {
@@ -60,8 +61,14 @@ const ContactList = ({ contacts, isChannel = false }) => {
               <div className="flex flex-col items-start justify-center gap-0">
                 <span className="font-semibold">{`${contact.firstName} ${contact.lastName}`}</span>
                 <div className="flex items-center justify-start gap-0.5 text-sm text-white/40 ">
-                  <span className="truncate max-w-34">
-                    {contact.lastMessage}
+                  <span className="truncate max-w-40">
+                    {contact.lastMessageSenderId === userInfo.id
+                      ? contact.lastMessageType === "text"
+                        ? `You: ${contact.lastMessage}`
+                        : "You sent an attachment"
+                      : contact.lastMessageType === "text"
+                        ? contact.lastMessage
+                        : `${contact.firstName} sent an attachment`}
                   </span>
                   <span>·</span>
                   <span className="">

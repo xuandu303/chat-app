@@ -43,6 +43,7 @@ export const createChatSlice = (set, get) => ({
     });
   },
   updateContactLastMessage: (message) => {
+    console.log("messages: ", message);
     const { directMessagesContacts, userInfo } = get();
 
     const contactId =
@@ -61,6 +62,8 @@ export const createChatSlice = (set, get) => ({
               ...c,
               lastMessage: message.content,
               lastMessageTime: message.timestamp,
+              lastMessageType: message.messageType,
+              lastMessageSenderId: message.sender._id,
             }
           : c,
       );
@@ -73,6 +76,8 @@ export const createChatSlice = (set, get) => ({
           ...newContact,
           lastMessage: message.content,
           lastMessageTime: message.timestamp,
+          lastMessageType: message.messageType,
+          lastMessageSenderId: message.sender._id,
         },
         ...directMessagesContacts,
       ];

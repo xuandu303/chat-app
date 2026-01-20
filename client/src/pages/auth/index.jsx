@@ -53,7 +53,7 @@ const Auth = () => {
             email,
             password,
           },
-          { withCredentials: true }
+          { withCredentials: true },
         );
         if (response.data.user.id) {
           setUserInfo(response.data.user);
@@ -75,7 +75,7 @@ const Auth = () => {
             email,
             password,
           },
-          { withCredentials: true }
+          { withCredentials: true },
         );
         if (response.status === 201) {
           navigate("/profile");
@@ -117,55 +117,73 @@ const Auth = () => {
                 </TabsTrigger>
               </TabsList>
               <TabsContent className="flex flex-col gap-5 mt-5" value="login">
-                <Input
-                  placeholder="Email"
-                  type="email"
-                  className="rounded-full p-6"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-                <Input
-                  placeholder="Password"
-                  type="password"
-                  className="rounded-full p-6"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <Button
-                  className="rounded-full p-6 cursor-pointer"
-                  onClick={handleLogin}
+                <form
+                  className="flex flex-col gap-5"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleLogin();
+                  }}
                 >
-                  Login
-                </Button>
+                  <Input
+                    placeholder="Email"
+                    type="email"
+                    className="rounded-full p-6"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                  <Input
+                    placeholder="Password"
+                    type="password"
+                    className="rounded-full p-6"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+
+                  <Button
+                    type="submit"
+                    className="rounded-full p-6 cursor-pointer"
+                  >
+                    Login
+                  </Button>
+                </form>
               </TabsContent>
               <TabsContent className="flex flex-col gap-5 mt-5" value="signup">
-                <Input
-                  placeholder="Email"
-                  type="email"
-                  className="rounded-full p-6"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-                <Input
-                  placeholder="Password"
-                  type="password"
-                  className="rounded-full p-6"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <Input
-                  placeholder="Confirm Password"
-                  type="password"
-                  className="rounded-full p-6"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                />
-                <Button
-                  className="rounded-full p-6 cursor-pointer"
-                  onClick={handleSignup}
+                <form
+                  className="flex flex-col gap-5"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSignup();
+                  }}
                 >
-                  Signup
-                </Button>
+                  <Input
+                    placeholder="Email"
+                    type="email"
+                    className="rounded-full p-6"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                  <Input
+                    placeholder="Password"
+                    type="password"
+                    className="rounded-full p-6"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <Input
+                    placeholder="Confirm Password"
+                    type="password"
+                    className="rounded-full p-6"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
+
+                  <Button
+                    type="submit"
+                    className="rounded-full p-6 cursor-pointer"
+                  >
+                    Signup
+                  </Button>
+                </form>
               </TabsContent>
             </Tabs>
           </div>

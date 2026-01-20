@@ -23,11 +23,10 @@ const messageSchema = new mongoose.Schema({
       return this.messageType === "text";
     },
   },
-  fileUrl: {
-    type: String,
-    required: function () {
-      return this.messageType === "file";
-    },
+  file: {
+    url: String,
+    name: String,
+    size: Number,
   },
   timestamp: {
     type: Date,
@@ -36,5 +35,14 @@ const messageSchema = new mongoose.Schema({
 });
 
 const Message = mongoose.model("Message", messageSchema);
+
+messageSchema.pre("validate", function (next) {
+  if (this.messageType === "file") {
+    if (!this.file?.url || !this.file?.name || !this.file?.size) {
+      return next(new Error("File message requires url, name and size"));
+    }
+  }
+  next();
+});
 
 export default Message;

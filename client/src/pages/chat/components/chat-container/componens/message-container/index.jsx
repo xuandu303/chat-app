@@ -4,6 +4,8 @@ import { GET_ALL_MESSAGES_ROUTES } from "@/utils/constants";
 import moment from "moment";
 import React, { useEffect, useRef } from "react";
 import { HOST } from "@/utils/constants";
+import { HiDocumentText } from "react-icons/hi2";
+import { formatFileSize } from "@/lib/utils";
 
 const MessageContainer = () => {
   const scrollRef = useRef();
@@ -66,6 +68,20 @@ const MessageContainer = () => {
     });
   };
 
+  const downloadFile = async (url, name) => {
+    const response = await apiClient.get(`${HOST}/${url}`, {
+      responseType: "blob",
+    });
+    const urlBlob = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement("a");
+    link.href = urlBlob;
+    link.download = name;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(urlBlob);
+  };
+
   const renderDMMessages = (message) => (
     <div
       className={`${
@@ -78,7 +94,7 @@ const MessageContainer = () => {
             message.sender !== selectedChatData._id
               ? "bg-[#8417ff] text-white"
               : " bg-gray-500/50 text-white/80"
-          } inline-block py-1.5 px-2.5 rounded-full my-1 max-w-[50%] wrap-break-word`}
+          } inline-block py-1.5 px-2.5 rounded-full my-1 wrap-break-word`}
         >
           {message.content}
         </div>
@@ -87,21 +103,36 @@ const MessageContainer = () => {
         <div
           className={`${
             message.sender !== selectedChatData._id
-              ? "bg-[#8417ff] text-white"
+              ? "bg-white/20 text-white"
               : "bg-gray-500/50 text-white/80"
-          } inline-block my-1 rounded-[18px] max-w-[50%] wrap-break-word`}
+          } inline-block my-1 rounded-[18px] wrap-break-word`}
         >
-          {checkIfImage(message.fileUrl) ? (
-            <div className="cursor-pointer">
+          {checkIfImage(message.file.url) ? (
+            <div className="cursor-pointer max-w-[50%]">
               <img
                 className="object-cover rounded-[18px]"
-                src={`${HOST}/${message.fileUrl}`}
+                src={`${HOST}/${message.file.url}`}
                 height={300}
                 width={300}
               />
             </div>
           ) : (
-            <div></div>
+            <div
+              className="flex items-center justify-center gap-2.5 cursor-pointer p-2 px-3"
+              onClick={() => downloadFile(message.file.url, message.file.name)}
+            >
+              <span className="text-white text-md bg-black/20 rounded-full p-2">
+                <HiDocumentText />
+              </span>
+              <div className="flex flex-col items-start justify-center">
+                <span className="whitespace-nowrap text-[15px] font-semibold">
+                  {message.file.name}
+                </span>{" "}
+                <span className="text-xs text-gray-200/50">
+                  {formatFileSize(message.file.size)}
+                </span>
+              </div>
+            </div>
           )}
         </div>
       )}

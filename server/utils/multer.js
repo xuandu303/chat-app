@@ -9,6 +9,7 @@ const ensureDir = (dir) => {
 };
 
 const sanitizeFileName = (originalName) => {
+  const fileName = Buffer.from(originalName, "latin1").toString("utf8");
   const ext = path.extname(originalName);
   const safeName = path
     .basename(originalName, ext)
@@ -18,6 +19,7 @@ const sanitizeFileName = (originalName) => {
   return {
     ext,
     name: safeName || "file",
+    originalName: fileName,
   };
 };
 
@@ -40,7 +42,8 @@ ensureDir(filesDir);
 const fileStorage = multer.diskStorage({
   destination: filesDir,
   filename: (req, file, cb) => {
-    const { name, ext } = sanitizeFileName(file.originalname);
+    const { name, ext, originalName } = sanitizeFileName(file.originalname);
+    req.originalName = originalName;
     cb(null, `${name}_${Date.now()}${ext}`);
   },
 });

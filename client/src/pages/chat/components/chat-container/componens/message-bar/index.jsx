@@ -75,7 +75,11 @@ const MessageBar = () => {
               content: null,
               recipient: selectedChatData._id,
               messageType: "file",
-              fileUrl: response.data.filePath,
+              file: {
+                url: response.data.filePath,
+                name: response.data.fileName,
+                size: response.data.fileSize,
+              },
             });
           }
           event.target.value = null;

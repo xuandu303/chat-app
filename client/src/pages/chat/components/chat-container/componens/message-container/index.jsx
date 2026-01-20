@@ -2,10 +2,12 @@ import apiClient from "@/lib/api-client";
 import { useAppStore } from "@/store";
 import { GET_ALL_MESSAGES_ROUTES } from "@/utils/constants";
 import moment from "moment";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { HOST } from "@/utils/constants";
 import { HiDocumentText } from "react-icons/hi2";
 import { formatFileSize } from "@/lib/utils";
+import { IoMdArrowRoundDown } from "react-icons/io";
+import { IoCloseSharp } from "react-icons/io5";
 
 const MessageContainer = () => {
   const scrollRef = useRef();
@@ -15,6 +17,8 @@ const MessageContainer = () => {
     selectedChatMessages,
     setSelectedChatMessages,
   } = useAppStore();
+  const [showImage, setShowImage] = useState(false);
+  const [image, setImage] = useState(null);
 
   useEffect(() => {
     const getMessages = async () => {
@@ -58,7 +62,7 @@ const MessageContainer = () => {
       return (
         <div key={message._id}>
           {showDate && (
-            <div className="text-center text-gray-500 my-2">
+            <div className="text-center text-gray-500 font-semibold text-sm my-2">
               {moment(message.timestamp).format("LL")}
             </div>
           )}
@@ -103,18 +107,25 @@ const MessageContainer = () => {
         <div
           className={`${
             message.sender !== selectedChatData._id
-              ? "bg-white/20 text-white"
+              ? "bg-white/20 text-white max-w-[50%]"
               : "bg-gray-500/50 text-white/80"
           } inline-block my-1 rounded-[18px] wrap-break-word`}
         >
           {checkIfImage(message.file.url) ? (
-            <div className="cursor-pointer max-w-[50%]">
+            <div
+              className="relative cursor-pointer group"
+              onClick={() => {
+                setShowImage(true);
+                setImage({ url: message.file.url, name: message.file.name });
+              }}
+            >
               <img
                 className="object-cover rounded-[18px]"
                 src={`${HOST}/${message.file.url}`}
                 height={300}
                 width={300}
               />
+              <div className="absolute inset-0 rounded-[18px] bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
             </div>
           ) : (
             <div
@@ -136,7 +147,7 @@ const MessageContainer = () => {
           )}
         </div>
       )}
-      <div className="text-xs text-gray-600">
+      <div className="text-xs text-gray-500 font-semibold">
         {moment(message.timestamp).format("LT")}
       </div>
     </div>
@@ -146,6 +157,42 @@ const MessageContainer = () => {
     <div className="flex-1 overflow-y-auto custom-scrollbar p-4 px-8 w-full">
       {renderMessages()}
       <div ref={scrollRef} />
+      {showImage && (
+        <div className="fixed inset-0 z-1000 flex items-start justify-center overflow-hidden">
+          <img
+            src={`${HOST}/${image.url}`}
+            className="absolute inset-0 h-full w-full object-cover scale-110 blur-xl"
+            alt=""
+          />
+
+          <div className="absolute inset-0 bg-black/60" />
+
+          <img
+            src={`${HOST}/${image.url}`}
+            className="relative z-10 top-3 max-h-[90vh] max-w-[90vw] object-contain shadow-2xl"
+            alt=""
+          />
+
+          <div className="fixed top-3 right-6 z-20 flex gap-2">
+            <button
+              className="bg-black/40 p-1.5 text-2xl rounded-full hover:bg-white/5 transition-all cursor-pointer"
+              onClick={() => downloadFile(image.url, image.name)}
+            >
+              <IoMdArrowRoundDown />
+            </button>
+
+            <button
+              className="bg-black/40 p-1.5 text-2xl rounded-full hover:bg-white/5 transition-all cursor-pointer"
+              onClick={() => {
+                setShowImage(false);
+                setImage(null);
+              }}
+            >
+              <IoCloseSharp />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

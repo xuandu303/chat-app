@@ -60,7 +60,7 @@ const ContactList = ({ contacts, isChannel = false }) => {
               </div>
             )}
             {isChannel ? (
-              <span className="font-semibold">{contact.firstName}</span>
+              <span className="font-semibold">{contact.name}</span>
             ) : (
               <div className="flex flex-col items-start justify-center gap-0">
                 <span className="font-semibold">{`${contact.firstName} ${contact.lastName}`}</span>

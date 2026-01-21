@@ -1,15 +1,22 @@
 import React, { useEffect } from "react";
 import ProfileInfo from "./components/profile-info";
 import NewDM from "./components/new-dm";
-import { GET_DM_CONTACTS_ROUTES } from "@/utils/constants";
+import {
+  GET_DM_CONTACTS_ROUTES,
+  GET_USER_CHANNELS_ROUTE,
+} from "@/utils/constants";
 import apiClient from "@/lib/api-client";
 import { useAppStore } from "@/store";
 import ContactList from "@/components/contact-list";
 import CreateChannel from "./components/create-channel";
 
 const ContactsContainer = () => {
-  const { setDirectMessagesContacts, directMessagesContacts, channels } =
-    useAppStore();
+  const {
+    setDirectMessagesContacts,
+    directMessagesContacts,
+    channels,
+    setChannels,
+  } = useAppStore();
 
   useEffect(() => {
     const getContacts = async () => {
@@ -21,7 +28,19 @@ const ContactsContainer = () => {
         setDirectMessagesContacts(response.data.contacts);
       }
     };
+
+    const getChannels = async () => {
+      const response = await apiClient.get(GET_USER_CHANNELS_ROUTE, {
+        withCredentials: true,
+      });
+
+      if (response.data.channels) {
+        setChannels(response.data.channels);
+      }
+    };
+
     getContacts();
+    getChannels();
   }, []);
 
   return (
@@ -29,7 +48,7 @@ const ContactsContainer = () => {
       <div className="pt-5 pb-8 flex justify-center">
         <Logo />
       </div>
-      <div className="flex flex-col gap-y-5 px-2">
+      <div className="flex flex-col gap-y-2 px-2">
         <div className="flex py-2 items-center px-3 justify-between">
           <Title text="Direct Messages" />
           <NewDM />

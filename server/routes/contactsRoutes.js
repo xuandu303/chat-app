@@ -4,7 +4,7 @@ import {
   getContactsForDMList,
   searchContacts,
   getAllContacts,
-} from "../controllers/contactsCtrl.js";
+} from "../controllers/contactCtrl.js";
 
 const contactsRoutes = Router();
 

@@ -23,7 +23,7 @@ const ContactList = ({ contacts, isChannel = false }) => {
   };
 
   useEffect(() => {
-    console.log("DM Contacts", contacts);
+    console.log("contact-list", contacts);
   }, []);
 
   return (

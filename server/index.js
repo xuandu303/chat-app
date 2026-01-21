@@ -7,6 +7,7 @@ import mongoose from "mongoose";
 import authRoutes from "./routes/authRoutes.js";
 import contactsRoutes from "./routes/contactsRoutes.js";
 import messagesRoutes from "./routes/messagesRoutes.js";
+import channelsRoutes from "./routes/channelsRoutes.js";
 import setupSocket from "./socket.js";
 import fs from "fs";
 
@@ -39,6 +40,7 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/contacts", contactsRoutes);
 app.use("/api/messages", messagesRoutes);
+app.use("/api/channels", channelsRoutes);
 
 const server = app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

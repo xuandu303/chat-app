@@ -13,6 +13,8 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import { getColor } from "@/lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const MessageContainer = () => {
   const scrollRef = useRef();
@@ -21,6 +23,7 @@ const MessageContainer = () => {
     selectedChatData,
     selectedChatMessages,
     setSelectedChatMessages,
+    userInfo,
   } = useAppStore();
   const [showImage, setShowImage] = useState(false);
   const [image, setImage] = useState(null);
@@ -59,10 +62,23 @@ const MessageContainer = () => {
 
   const renderMessages = () => {
     let lastDate = null;
+    let showAvatar;
+    let showName;
     return selectedChatMessages.map((message, idx) => {
       const messageDate = moment(message.timestamp).format("YYYY-MM-DD");
       const showDate = messageDate !== lastDate;
       lastDate = messageDate;
+      if (selectedChatType === "channel") {
+        const nextMessage = selectedChatMessages[idx + 1];
+
+        showAvatar =
+          !nextMessage || nextMessage.sender._id !== message.sender._id;
+
+        const prevMessage = selectedChatMessages[idx - 1];
+
+        showName =
+          !prevMessage || prevMessage.sender._id !== message.sender._id;
+      }
 
       return (
         <div key={message._id}>
@@ -72,6 +88,8 @@ const MessageContainer = () => {
             </div>
           )}
           {selectedChatType === "contact" && renderDMMessages(message, idx)}
+          {selectedChatType === "channel" &&
+            renderChannelMessages(message, idx, showAvatar, showName)}
         </div>
       );
     });
@@ -95,7 +113,7 @@ const MessageContainer = () => {
     <div
       className={`${
         message.sender === selectedChatData._id ? "text-left" : "text-right"
-      }`}
+      } mt-1.75`}
     >
       <HoverCard>
         <HoverCardTrigger className="h-auto w-auto inline-block">
@@ -106,7 +124,7 @@ const MessageContainer = () => {
                   message.sender !== selectedChatData._id
                     ? "bg-[#8417ff] text-white"
                     : " bg-gray-500/50 text-white/80"
-                } inline-block py-1.5 px-2.5 rounded-full my-1 wrap-break-word`}
+                } inline-block py-1.5 px-2.5 rounded-full wrap-break-word`}
               >
                 {message.content}
               </div>
@@ -118,7 +136,7 @@ const MessageContainer = () => {
                 message.sender !== selectedChatData._id
                   ? "bg-white/20 text-white"
                   : "bg-gray-500/50 text-white/80"
-              }  block max-w-none h-auto my-1 rounded-[18px] wrap-break-word`}
+              }  block max-w-none h-auto rounded-[18px] wrap-break-word leading-none`}
             >
               {checkIfImage(message.file.url) ? (
                 <div
@@ -141,15 +159,15 @@ const MessageContainer = () => {
                 </div>
               ) : (
                 <div
-                  className="flex items-center justify-center gap-2.5 cursor-pointer p-2 px-3"
+                  className="flex items-center justify-center gap-2.5 cursor-pointer p-2.5 px-3"
                   onClick={() =>
                     downloadFile(message.file.url, message.file.name)
                   }
                 >
-                  <span className="text-white text-md bg-black/20 rounded-full p-2">
+                  <span className="text-white text-[17px] bg-black/20 rounded-full p-2">
                     <HiDocumentText />
                   </span>
-                  <div className="flex flex-col items-start justify-center">
+                  <div className="flex flex-col items-start justify-center gap-1">
                     <span className="whitespace-nowrap text-[15px] font-semibold">
                       {message.file.name}
                     </span>{" "}
@@ -171,7 +189,132 @@ const MessageContainer = () => {
         </HoverCardContent>
       </HoverCard>
       {selectedChatMessages.length === idx + 1 && (
-        <div className="text-xs text-gray-500 font-semibold">
+        <div
+          className={`${message.sender === selectedChatData._id ? "ml-2.5" : "mr-2.5"} text-xs text-gray-500 font-semibold`}
+        >
+          Sent {formatLastMessageTime(message.timestamp)} ago
+        </div>
+      )}
+    </div>
+  );
+
+  const renderChannelMessages = (message, idx, showAvatar, showName) => (
+    <div
+      className={`${
+        message.sender._id !== userInfo.id ? "text-left" : "text-right"
+      } mt-1`}
+    >
+      <HoverCard>
+        <HoverCardTrigger className="h-auto w-auto inline-block">
+          <div className="flex gap-2 items-end">
+            {message.sender._id !== userInfo.id &&
+              (showAvatar ? (
+                <div className="flex items-center justify-center gap-3">
+                  <Avatar className="w-8 h-8 rounded-full overflow-hidden">
+                    {message.sender.image && (
+                      <AvatarImage
+                        src={`${HOST}/${message.sender.image}`}
+                        alt="profile"
+                        className="object-cover rounded-full w-full h-full bg-black"
+                      />
+                    )}
+                    <AvatarFallback
+                      className={`uppercase h-8 w-8 text-lg flex items-center justify-center rounded-full ${getColor(
+                        message.sender.color,
+                      )}`}
+                    >
+                      {message.sender.firstName
+                        ? message.sender.firstName.split("").shift()
+                        : message.sender.email.split("").shift()}
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
+              ) : (
+                <div className="w-8 h-8 border"></div>
+              ))}
+
+            <div className="flex flex-col max-w-[60vw]">
+              {message.sender._id !== userInfo.id && showName && (
+                <div className="text-xs text-white/60 ml-2.5">{`${message.sender.firstName}`}</div>
+              )}
+
+              <div>
+                {message.messageType === "text" && (
+                  <div
+                    className={`${
+                      message.sender._id === userInfo.id
+                        ? "bg-[#8417ff] text-white"
+                        : " bg-gray-500/50 text-white/80"
+                    } inline-block py-1.5 px-2.5 rounded-full wrap-break-word`}
+                  >
+                    {message.content}
+                  </div>
+                )}
+                {message.messageType === "file" && (
+                  <div
+                    className={`${
+                      message.sender._id === userInfo.id
+                        ? "bg-white/20 text-white"
+                        : "bg-gray-500/50 text-white/80"
+                    }  block max-w-none h-auto rounded-[18px] wrap-break-word leading-none`}
+                  >
+                    {checkIfImage(message.file.url) ? (
+                      <div
+                        className="relative cursor-pointer group"
+                        onClick={() => {
+                          setShowImage(true);
+                          setImage({
+                            url: message.file.url,
+                            name: message.file.name,
+                          });
+                        }}
+                      >
+                        <img
+                          className="object-cover rounded-[18px]"
+                          src={`${HOST}/${message.file.url}`}
+                          height={300}
+                          width={300}
+                        />
+                        <div className="absolute inset-0 rounded-[18px] bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                      </div>
+                    ) : (
+                      <div
+                        className="flex items-center justify-center gap-2.5 cursor-pointer p-2.5 px-3"
+                        onClick={() =>
+                          downloadFile(message.file.url, message.file.name)
+                        }
+                      >
+                        <span className="text-white text-[17px] bg-black/20 rounded-full p-2">
+                          <HiDocumentText />
+                        </span>
+                        <div className="flex flex-col items-start justify-center gap-1">
+                          <span className="whitespace-nowrap text-[15px] font-semibold">
+                            {message.file.name}
+                          </span>{" "}
+                          <span className="text-xs text-gray-200/50">
+                            {formatFileSize(message.file.size)}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </HoverCardTrigger>
+        <HoverCardContent
+          side={`${message.sender._id !== userInfo.id ? "right" : "left"}`}
+          align="center"
+          className="bg-gray-200 p-2 rounded-lg shadow-lg text-xs"
+        >
+          {moment(message.timestamp).format("LT")}
+        </HoverCardContent>
+      </HoverCard>
+      {selectedChatMessages.length === idx + 1 && (
+        <div
+          className={`${message.sender._id !== userInfo.id ? "ml-12.5" : "mr-2.5"} text-xs text-gray-500 font-semibold leading-none`}
+        >
           Sent {formatLastMessageTime(message.timestamp)} ago
         </div>
       )}

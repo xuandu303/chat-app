@@ -50,8 +50,8 @@ export const createChatSlice = (set, get) => ({
       ],
     });
   },
+
   updateContactLastMessage: (message) => {
-    console.log("messages: ", message);
     const { directMessagesContacts, userInfo } = get();
 
     const contactId =

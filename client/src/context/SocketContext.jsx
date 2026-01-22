@@ -51,6 +51,7 @@ export const SocketProvider = ({ children }) => {
         selectedChatType,
         addMessage,
         // updateContactLastMessage,
+        addChannelInChannelList,
       } = useAppStore.getState();
       // updateContactLastMessage(message);
       if (
@@ -59,6 +60,7 @@ export const SocketProvider = ({ children }) => {
       ) {
         addMessage(message);
       }
+      addChannelInChannelList(message);
     };
 
     socketRef.current.on("receiveMessage", handleReceiveMessage);

@@ -1,5 +1,5 @@
 import { useAppStore } from "@/store";
-import React, { useEffect } from "react";
+import React from "react";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { HOST } from "@/utils/constants";
 import { getColor, formatLastMessageTime } from "@/lib/utils";
@@ -21,10 +21,6 @@ const ContactList = ({ contacts, isChannel = false }) => {
       setSelectedChatMessages([]);
     }
   };
-
-  useEffect(() => {
-    console.log("contact-list", contacts);
-  }, []);
 
   return (
     <div>
@@ -59,28 +55,40 @@ const ContactList = ({ contacts, isChannel = false }) => {
                 #
               </div>
             )}
-            {isChannel ? (
-              <span className="font-semibold">{contact.name}</span>
-            ) : (
-              <div className="flex flex-col items-start justify-center gap-0">
-                <span className="font-semibold">{`${contact.firstName} ${contact.lastName}`}</span>
-                <div className="flex items-center justify-start gap-0.5 text-sm text-white/40 ">
-                  <span className="truncate max-w-40">
-                    {contact.lastMessageSenderId === userInfo.id
+            <div className="flex flex-col items-start justify-center gap-0">
+              <span className="font-semibold">
+                {isChannel
+                  ? `${contact.name}`
+                  : `${contact.firstName} ${contact.lastName}`}
+              </span>
+              <div className="flex items-center justify-start gap-0.5 text-sm text-white/40 ">
+                <span className="truncate max-w-40">
+                  {!isChannel &&
+                    contact.lastMessageSenderId &&
+                    (contact.lastMessageSenderId === userInfo.id
                       ? contact.lastMessageType === "text"
                         ? `You: ${contact.lastMessage}`
                         : "You sent an attachment"
                       : contact.lastMessageType === "text"
                         ? contact.lastMessage
-                        : `${contact.firstName} sent an attachment`}
-                  </span>
-                  <span>·</span>
-                  <span className="">
-                    {formatLastMessageTime(contact.lastMessageTime)}
-                  </span>
-                </div>
+                        : `${contact.firstName} sent an attachment`)}
+
+                  {isChannel &&
+                    contact.lastMessageSender &&
+                    (contact.lastMessageSender._id === userInfo.id
+                      ? contact.lastMessageType === "text"
+                        ? `You: ${contact.lastMessage}`
+                        : "You sent an attachment"
+                      : contact.lastMessageType === "text"
+                        ? `${contact.lastMessageSender.firstName}: ${contact.lastMessage}`
+                        : `${contact.lastMessageSender.firstName} sent an attachment`)}
+                </span>
+                <span>·</span>
+                <span className="">
+                  {formatLastMessageTime(contact.lastMessageTime)}
+                </span>
               </div>
-            )}
+            </div>
           </div>
         </div>
       ))}

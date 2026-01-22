@@ -31,9 +31,6 @@ export const signup = async (req, res) => {
       user: {
         id: user.id,
         email: user.email,
-        // firstName: user.firstName,
-        // lastName: user.lastName,
-        // image: user.image,
         profileSetup: user.profileSetup,
       },
     });
@@ -121,7 +118,7 @@ export const updateProfile = async (req, res) => {
         color,
         profileSetup: true,
       },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     return res.status(200).json({
@@ -149,7 +146,7 @@ export const addProfileImage = async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       req.userId,
       { image: filePath },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     return res.status(200).json({

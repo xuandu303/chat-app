@@ -34,7 +34,6 @@ const App = () => {
         } else {
           setUserInfo(undefined);
         }
-        console.log({ response });
       } catch (error) {
         console.error(error);
         setUserInfo(undefined);

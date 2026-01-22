@@ -1,8 +1,11 @@
 import apiClient from "@/lib/api-client";
 import { useAppStore } from "@/store";
-import { GET_ALL_MESSAGES_ROUTES } from "@/utils/constants";
+import {
+  GET_ALL_MESSAGES_ROUTES,
+  GET_CHANNEL_MESSAGES,
+} from "@/utils/constants";
 import moment from "moment";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { HOST } from "@/utils/constants";
 import { HiDocumentText } from "react-icons/hi2";
 import { formatFileSize, formatLastMessageTime } from "@/lib/utils";
@@ -17,7 +20,7 @@ import { getColor } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const MessageContainer = () => {
-  const scrollRef = useRef();
+  const containerRef = useRef(null);
   const {
     selectedChatType,
     selectedChatData,
@@ -43,15 +46,40 @@ const MessageContainer = () => {
         console.log({ error });
       }
     };
+
+    const getChannelMessages = async () => {
+      try {
+        const response = await apiClient.get(
+          `${GET_CHANNEL_MESSAGES}/${selectedChatData._id}`,
+          { withCredentials: true },
+        );
+        if (response.data.messages) {
+          setSelectedChatMessages(response.data.messages);
+        }
+      } catch (error) {
+        console.log({ error });
+      }
+    };
+
     if (selectedChatData._id) {
       if (selectedChatType === "contact") getMessages();
+      else if (selectedChatType === "channel") getChannelMessages();
     }
   }, [selectedChatData, selectedChatType, setSelectedChatMessages]);
 
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
+  useLayoutEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    el.scrollTop = el.scrollHeight;
+
+    requestAnimationFrame(() => {
+      el.scrollTop = el.scrollHeight;
+    });
+
+    setTimeout(() => {
+      el.scrollTop = el.scrollHeight;
+    }, 50);
   }, [selectedChatMessages.length]);
 
   const checkIfImage = (filePath) => {
@@ -200,12 +228,12 @@ const MessageContainer = () => {
 
   const renderChannelMessages = (message, idx, showAvatar, showName) => (
     <div
-      className={`${
-        message.sender._id !== userInfo.id ? "text-left" : "text-right"
+      className={`flex flex-col gap-px ${
+        message.sender._id !== userInfo.id ? "items-start" : "items-end"
       } mt-1`}
     >
       <HoverCard>
-        <HoverCardTrigger className="h-auto w-auto inline-block">
+        <HoverCardTrigger className="h-auto w-auto inline-flex">
           <div className="flex gap-2 items-end">
             {message.sender._id !== userInfo.id &&
               (showAvatar ? (
@@ -230,7 +258,7 @@ const MessageContainer = () => {
                   </Avatar>
                 </div>
               ) : (
-                <div className="w-8 h-8 border"></div>
+                <div className="w-8 h-8"></div>
               ))}
 
             <div className="flex flex-col max-w-[60vw]">
@@ -322,15 +350,21 @@ const MessageContainer = () => {
   );
 
   return (
-    <div className="flex-1 overflow-y-auto custom-scrollbar p-4 px-8 w-full">
+    <div
+      ref={containerRef}
+      className="flex-1 overflow-y-auto custom-scrollbar px-8 w-full"
+    >
       {renderMessages()}
-      <div ref={scrollRef} />
       {showImage && (
         <div className="fixed inset-0 z-1000 flex items-start justify-center overflow-hidden">
           <img
             src={`${HOST}/${image.url}`}
             className="absolute inset-0 h-full w-full object-cover scale-110 blur-xl"
             alt=""
+            onLoad={() => {
+              const el = containerRef.current;
+              if (el) el.scrollTop = el.scrollHeight;
+            }}
           />
 
           <div className="absolute inset-0 bg-black/60" />

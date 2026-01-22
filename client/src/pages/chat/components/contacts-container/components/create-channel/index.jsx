@@ -18,14 +18,12 @@ import apiClient from "@/lib/api-client";
 import {
   CREATE_CHANNEL_ROUTE,
   GET_ALL_CONTACTS_ROUTES,
-  HOST,
 } from "@/utils/constants";
 import { useAppStore } from "@/store";
 import { Button } from "@/components/ui/button";
 import MultipleSelector from "@/components/ui/multiple-selector";
 const CreateChannel = () => {
-  const { setSelectedChatType, setSelectedChatData, addChannel } =
-    useAppStore();
+  const { addChannel } = useAppStore();
   const [newChannelModal, setNewChannelModal] = useState(false);
   const [allContacts, setAllContacts] = useState([]);
   const [selectedContacts, setSelectedContacts] = useState([]);
@@ -36,7 +34,6 @@ const CreateChannel = () => {
       const response = await apiClient.get(GET_ALL_CONTACTS_ROUTES, {
         withCredentials: true,
       });
-      console.log({ response });
       setAllContacts(response.data.contacts);
     };
     getData();
@@ -61,7 +58,6 @@ const CreateChannel = () => {
           setNewChannelModal(false);
           addChannel(response.data.channel);
         }
-        console.log({ response });
       }
     } catch (error) {
       console.log({ error });
@@ -94,7 +90,7 @@ const CreateChannel = () => {
           <div>
             <Input
               placeholder="Channel Name"
-              className="rounded-lg p-6 bg-[#2c2e3b] border-none"
+              className="rounded-lg py-6 px-3 bg-[#2c2e3b] border-none"
               onChange={(e) => setChannelName(e.target.value)}
               value={channelName}
             />

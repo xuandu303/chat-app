@@ -37,13 +37,104 @@ export const createChannel = async (req, res) => {
 
 export const getUserChannels = async (req, res) => {
   try {
-    const userId = new mongoose.Types.ObjectId(req.userId);
+    let { userId } = req;
+    userId = new mongoose.Types.ObjectId(userId);
 
-    const channels = await Channel.find({
-      $or: [{ admin: userId }, { members: userId }],
-    }).sort({ updatedAt: -1 });
+    const channels = await Channel.aggregate([
+      {
+        $match: {
+          $or: [{ admin: userId }, { members: userId }],
+        },
+      },
+      {
+        $lookup: {
+          from: "messages",
+          let: { messageIds: "$messages" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $in: ["$_id", "$$messageIds"] },
+              },
+            },
+            { $sort: { timestamp: -1 } },
+            { $limit: 1 },
+            {
+              $lookup: {
+                from: "users",
+                let: { senderId: "$sender" },
+                pipeline: [
+                  {
+                    $match: {
+                      $expr: { $eq: ["$_id", "$$senderId"] },
+                    },
+                  },
+                  {
+                    $project: {
+                      password: 0,
+                      __v: 0,
+                      email: 0,
+                    },
+                  },
+                ],
+                as: "sender",
+              },
+            },
+            {
+              $unwind: {
+                path: "$sender",
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+          ],
+          as: "lastMessage",
+        },
+      },
+      {
+        $addFields: {
+          lastMessage: { $arrayElemAt: ["$lastMessage", 0] },
+        },
+      },
+      {
+        $project: {
+          name: 1,
+          admin: 1,
+          members: 1,
+          lastMessageType: "$lastMessage.messageType",
+          lastMessageTime: "$lastMessage.timestamp",
+          lastMessage: "$lastMessage.content",
+          lastMessageSender: "$lastMessage.sender",
+        },
+      },
+      {
+        $sort: { lastMessageTime: -1 },
+      },
+    ]);
 
-    return res.status(201).json({ channels });
+    return res.status(200).json({ channels });
+  } catch (error) {
+    console.error("Create channel error:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const getChannelMessages = async (req, res) => {
+  try {
+    const { channelId } = req.params;
+
+    const channel = await Channel.findById(channelId).populate({
+      path: "messages",
+      populate: {
+        path: "sender",
+        select: "firstName lastName email _id image color",
+      },
+    });
+
+    if (!channel) {
+      return response.status(404).send("Channel not found");
+    }
+
+    const messages = channel.messages;
+    return res.status(201).json({ messages });
   } catch (error) {
     console.error("Create channel error:", error);
     return res.status(500).json({ message: "Internal Server Error" });

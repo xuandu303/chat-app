@@ -64,13 +64,7 @@ A real-time chat app built **only for learning**. This repo exists to practice W
 
 ## Lessons learned / notes
 
-- Socket event names and payload structure matter more than I expected.
-- Reconnect behavior can cause missed updates unless state is refreshed.
-- Real-time UX depends on good separation between API data and live events.
-
-## Limitations / future improvements
-
-- Minimal error handling and input validation.
-- Basic auth flow only; no refresh tokens or roles.
-- No production hardening (security, monitoring, scaling).
-- Limited testing around socket events and reconnect edge cases.
+- Socket event naming and payload structure act as real-time API contracts.
+- Reconnection requires state resynchronization to avoid missing updates.
+- Using Zustand as a central store simplifies merging API data and real-time events,
+  prevents duplicated messages, and keeps UI components stateless.
